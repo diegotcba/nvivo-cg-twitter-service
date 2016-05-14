@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
+
+       <import resource="classpath:DataSource.xml" />
+       <import resource="classpath:META-INF/cxf/cxf.xml" />
+
+       <jaxrs:server id="restApi" address="/">
+              <jaxrs:providers>
+                     <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider" />
+              </jaxrs:providers>
+              <jaxrs:serviceBeans>
+                     <ref bean="restTwitterService" />
+              </jaxrs:serviceBeans>
+       </jaxrs:server>
+
+       <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" >
+              <property name="locations">
+                     <list>
+                            <value>classpath:oauth.properties</value>
+                            <value>classpath:database.properties</value>
+                            <value>classpath:twitter-svc.properties</value>
+                     </list>
+              </property>
+       </bean>
+
+       <bean id="restTwitterService" class="com.nvivo.twitter.svc.rest.impl.RestTwitterServiceImpl">
+              <property name="service" ref="twitterService" />
+              <property name="facebookService" ref="facebookService" />
+       </bean>
+       <bean id="twitterService" class="com.nvivo.twitter.svc.service.impl.TwitterServiceImpl">
+              <property name="apiService" ref="twitterApi" />
+              <property name="daoService" ref="twitterDao" />
+       </bean>
+
+       <bean id="facebookService" class="com.nvivo.twitter.svc.service.impl.FacebookServiceImpl">
+              <property name="daoService" ref="facebookApi" />
+       </bean>
+
+       <bean id="twitterApi" class="com.nvivo.twitter.svc.dao.impl.TwitterApiImpl" >
+              <constructor-arg name="configurationBuilder" ref="twitterConfigBuilder" />
+       </bean>
+
+       <bean id="facebookApi" class="com.nvivo.twitter.svc.dao.impl.FacebookApiImpl">
+              <constructor-arg name="configurationBuilder" ref="facebookConfigBuilder" />
+       </bean>
+
+       <bean id="twitterConfigBuilder" class="twitter4j.conf.ConfigurationBuilder">
+              <property name="OAuthConsumerKey" value="${twitter.apiKey}" />
+              <property name="OAuthConsumerSecret" value="${twitter.apiSecret}" />
+              <property name="OAuthAccessToken" value="${twitter.accessToken}" />
+              <property name="OAuthAccessTokenSecret" value="${twitter.accessTokenSecret}" />
+       </bean>
+       
+       <bean id="facebookConfigBuilder" class="facebook4j.conf.ConfigurationBuilder">
+              <property name="OAuthAppId" value="${facebook.appId}" />
+              <property name="OAuthAppSecret" value="${facebook.appSecret}" />
+              <property name="OAuthAccessToken" value="${facebook.accessToken}" />
+       </bean>
+
+       <bean id="twitterDao" class="com.nvivo.twitter.svc.dao.impl.TwitterDaoImpl">
+              <property name="dbConnection" ref="dbConnection" />
+       </bean>
+
+       <bean id="dbConnection" class="com.nvivo.twitter.svc.dao.impl.DBConnection">
+              <property name="dataSource" ref="dataSource" />
+       </bean>
+</beans>
