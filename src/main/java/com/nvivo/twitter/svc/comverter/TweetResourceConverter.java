@@ -21,6 +21,7 @@ public class TweetResourceConverter {
         result.setUrlAvatar(tweet.getUrlAvatar());
         result.setDateTime(tweet.getDateTime().toString());
         result.setRetweet(tweet.isRetweet());
+        result.setProfileImages(tweet.getProfileImages());
 
         return result;
     }

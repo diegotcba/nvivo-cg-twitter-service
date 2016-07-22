@@ -134,20 +134,22 @@ public class TwitterServiceImpl implements TwitterService {
         //TODO: add update call to db for local urls
         downloadMediasByUrl(tweetPlaylist);
 
-        return result;
+        return daoService.getPlaylist(result.getId());
     }
 
     private void downloadMediasByUrl(List<TweetResource> tweetResources) {
         List<MediaDownloadJob> jobList = new ArrayList<>();
 
         tweetResources.stream().forEach(tweetResource -> {
-            MediaDownloadJob mediaJob = new MediaDownloadJob();
+            tweetResource.getProfileImages().forEach((tpimg -> {
+                MediaDownloadJob mediaJob = new MediaDownloadJob();
 
-            mediaJob.setMediaId(Long.valueOf(tweetResource.getId()));
-            mediaJob.setMediaName("avatar");
-            mediaJob.setSourceMediaUrl(tweetResource.getUrlAvatar());
+                mediaJob.setMediaId(Long.valueOf(tweetResource.getId()));
+                mediaJob.setMediaName(tpimg.getProfileImageType());
+                mediaJob.setSourceMediaUrl(tpimg.getProfileImageUrl());
 
-            jobList.add(mediaJob);
+                jobList.add(mediaJob);
+            }));
         });
 
         mediaJob(jobList);
@@ -159,7 +161,7 @@ public class TwitterServiceImpl implements TwitterService {
         task.setDaoService(daoService);
         task.setMediaJob(mediaJobs);
 
-        LOGGER.trace("Iniciando tarea de descarga medias.");
+        LOGGER.trace("Iniciando tarea de descarga de archivos multimedia.");
         executor.submit(task);
     }
 

@@ -3,6 +3,8 @@ package com.nvivo.twitter.svc.model;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by DiegoT on 28/11/2015.
@@ -19,4 +21,5 @@ public class TweetResponse {
     private LocalDateTime dateTime;
     private String htmlMessage;
     private boolean isRetweet;
+    private List<TweetProfileImage> profileImages;
 }

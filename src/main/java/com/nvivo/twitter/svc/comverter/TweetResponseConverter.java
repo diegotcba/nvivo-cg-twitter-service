@@ -1,14 +1,12 @@
 package com.nvivo.twitter.svc.comverter;
 
+import com.nvivo.twitter.svc.model.TweetProfileImage;
 import com.nvivo.twitter.svc.model.TweetResponse;
 import twitter4j.HashtagEntity;
 import twitter4j.Status;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.time.LocalDateTime.ofInstant;
 
@@ -25,6 +23,23 @@ public class TweetResponseConverter {
         result.setDateTime(ofInstant(status.getCreatedAt().toInstant(), ZoneId.systemDefault()));
         result.setUrlAvatar(status.getUser().getMiniProfileImageURL());
         result.setRetweet(status.isRetweet());
+
+        List<TweetProfileImage> avatars = new ArrayList<>();
+
+        TweetProfileImage tpimg = new TweetProfileImage();
+        tpimg.setProfileImageType("profile");
+        tpimg.setProfileImageUrl(status.getUser().getProfileImageURL());
+        avatars.add(tpimg);
+
+        tpimg = new TweetProfileImage();
+        tpimg.setProfileImageType("mini");
+        tpimg.setProfileImageUrl(status.getUser().getMiniProfileImageURL());
+        avatars.add(tpimg);
+
+//        avatars.put("original", status.getUser().getOriginalProfileImageURL());
+//        avatars.put("bigger", status.getUser().getBiggerProfileImageURL());
+
+        result.setProfileImages(avatars);
 
         List<HashtagEntity> hashtags = Arrays.asList(status.getHashtagEntities());
 
